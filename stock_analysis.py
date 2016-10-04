@@ -4,8 +4,8 @@ import pandas.io.data as web
 #import pandas-datareader as web   # Package and modules for importing data; this code may change depending on pandas version
 import datetime
 
-# We will look at stock prices over the past year, starting at January 1, 2016
-start = datetime.datetime(2015,1,1)
+# We will look at stock prices over a certain time frame
+start = datetime.datetime(2012,8,20) # my start date!
 end = datetime.date.today()
 
 # Let's get microsoft stock data; microsoft's ticker symbol is AAPL
@@ -117,11 +117,14 @@ pandas_candlestick_ohlc(microsoft)
 
 apple = web.DataReader("AAPL", "yahoo", start, end)
 google = web.DataReader("GOOG", "yahoo", start, end)
+amazon = web.DataReader("AMZN", "yahoo", start, end)
 
 # Below I create a DataFrame consisting of the adjusted closing price of these stocks, first by making a list of these objects and using the join method
 stocks = pd.DataFrame({"AAPL": apple["Adj Close"],
                       "MSFT": microsoft["Adj Close"],
-                      "GOOG": google["Adj Close"]})
+                      "GOOG": google["Adj Close"]
+                    #    ,"AMZN": amazon["Adj Close"]
+})
 
 stocks.head()
 stocks.plot(grid = True)
@@ -141,15 +144,15 @@ stock_change = stocks.apply(lambda x: np.log(x) - np.log(x.shift(1))) # shift mo
 stock_change.head()
 
 microsoft["20d"] = np.round(microsoft["Close"].rolling(window = 20, center = False).mean(), 2)
-pandas_candlestick_ohlc(microsoft.loc['2016-01-04':'2016-08-07',:], otherseries = "20d")
+pandas_candlestick_ohlc(microsoft.loc[start:end,:], otherseries = "20d")
 
-start = datetime.datetime(2010,1,1)
+# start = datetime.datetime(2012,8,20)
 microsoft = web.DataReader("MSFT", "yahoo", start, end)
 microsoft["20d"] = np.round(microsoft["Close"].rolling(window = 20, center = False).mean(), 2)
 
-pandas_candlestick_ohlc(microsoft.loc['2010-01-04':'2016-08-07',:], otherseries = "20d")
+pandas_candlestick_ohlc(microsoft.loc[start:end,:], otherseries = "20d")
 
 microsoft["50d"] = np.round(microsoft["Close"].rolling(window = 50, center = False).mean(), 2)
 microsoft["200d"] = np.round(microsoft["Close"].rolling(window = 200, center = False).mean(), 2)
 
-pandas_candlestick_ohlc(microsoft.loc['2010-01-04':'2016-08-07',:], otherseries = ["20d", "50d", "200d"])
+pandas_candlestick_ohlc(microsoft.loc[start:end,:], otherseries = ["20d", "50d", "200d"])
